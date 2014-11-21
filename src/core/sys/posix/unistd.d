@@ -2,7 +2,7 @@
  * D header file for POSIX.
  *
  * Copyright: Copyright Sean Kelly 2005 - 2009.
- * License:   <a href="http://www.boost.org/LICENSE_1_0.txt">Boost License 1.0</a>.
+ * License:   $(WEB www.boost.org/LICENSE_1_0.txt, Boost License 1.0).
  * Authors:   Sean Kelly
  * Standards: The Open Group Base Specifications Issue 6, IEEE Std 1003.1, 2004 Edition
  */
@@ -136,7 +136,7 @@ else version( Solaris )
             off64_t lseek64(int, off64_t, int) @trusted;
             alias   lseek64 lseek;
 
-            int     ftruncate64(int, off64) @trusted;
+            int     ftruncate64(int, off64_t) @trusted;
             alias   ftruncate64 ftruncate;
         }
         else

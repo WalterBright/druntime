@@ -73,12 +73,6 @@ ifeq (solaris,$(OS))
     CFLAGS+=-D_REENTRANT  # for thread-safe errno
 endif
 
-ifeq (osx,$(OS))
-    ASMFLAGS =
-else
-    ASMFLAGS = -Wa,--noexecstack
-endif
-
 OBJDIR=obj/$(MODEL)
 DRUNTIME_BASE=druntime-$(OS)$(MODEL)
 DRUNTIME=lib/lib$(DRUNTIME_BASE).a
@@ -108,7 +102,7 @@ SRCS:=$(subst \,/,$(SRCS))
 # NOTE: a pre-compiled minit.obj has been provided in dmd for Win32	 and
 #       minit.asm is not used by dmd for Linux
 
-OBJS= $(OBJDIR)/errno_c.o $(OBJDIR)/threadasm.o
+OBJS= $(OBJDIR)/errno_c.o $(OBJDIR)/bss_section.o $(OBJDIR)/threadasm.o
 
 ######################## All of'em ##############################
 
@@ -163,7 +157,7 @@ $(OBJDIR)/errno_c.o : src/core/stdc/errno.c
 
 $(OBJDIR)/threadasm.o : src/core/threadasm.S
 	@mkdir -p $(OBJDIR)
-	$(CC) $(ASMFLAGS) -c $(CFLAGS) $< -o$@
+	$(CC) -c $(CFLAGS) $< -o$@
 
 ######################## Create a shared library ##############################
 
@@ -251,10 +245,11 @@ druntime.zip: $(MANIFEST) $(IMPORTS)
 	zip $@ $^
 
 install: target
-	mkdir -p $(INSTALL_DIR)/import
-	cp -r import/* $(INSTALL_DIR)/import/
-	mkdir -p $(INSTALL_DIR)/lib
-	cp -r lib/* $(INSTALL_DIR)/lib/
+	mkdir -p $(INSTALL_DIR)/src/druntime/import
+	cp -r import/* $(INSTALL_DIR)/src/druntime/import/
+	$(eval lib_dir=$(if $(filter $(OS),osx), lib, lib$(MODEL)))
+	mkdir -p $(INSTALL_DIR)/$(OS)/$(lib_dir)
+	cp -r lib/* $(INSTALL_DIR)/$(OS)/$(lib_dir)/
 	cp LICENSE $(INSTALL_DIR)/druntime-LICENSE.txt
 
 clean: $(addsuffix /.clean,$(ADDITIONAL_TESTS))

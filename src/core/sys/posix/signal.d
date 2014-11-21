@@ -565,6 +565,9 @@ int sigsuspend(in sigset_t*);
 int sigwait(in sigset_t*, int*);
 */
 
+nothrow @nogc
+{
+
 version( linux )
 {
     enum SIG_HOLD = cast(sigfn_t2) 1;
@@ -611,7 +614,7 @@ version( linux )
 
         union _sifields_t
         {
-            int _pad[__SI_PAD_SIZE];
+            int[__SI_PAD_SIZE] _pad;
 
             // kill()
             struct _kill_t
@@ -725,7 +728,7 @@ else version( OSX )
         void*   si_addr;
         sigval  si_value;
         int     si_band;
-        uint    pad[7];
+        uint[7] pad;
     }
 
     enum SI_USER    = 0x10001;
@@ -750,7 +753,7 @@ else version( FreeBSD )
 {
     struct sigset_t
     {
-        uint __bits[4];
+        uint[4] __bits;
     }
 
     struct siginfo_t
@@ -816,7 +819,7 @@ else version (Solaris)
 
     struct sigset_t
     {
-        uint __bits[4];
+        uint[4] __bits;
     }
 
     struct siginfo_t
@@ -831,9 +834,9 @@ else version (Solaris)
         union ___data
         {
             version (D_LP64)
-                int si_pad[(256 / int.sizeof) - 4];
+                int[(256 / int.sizeof) - 4] si_pad;
             else
-                int si_pad[(128 / int.sizeof) - 3];
+                int[(128 / int.sizeof) - 3] si_pad;
 
             struct ___proc
             {
@@ -890,8 +893,8 @@ else version (Solaris)
                 short __syscall;
                 char __nsysarg;
                 char __fault;
-                c_long __sysarg[8];
-                int __mstate[10];
+                c_long[8] __sysarg;
+                int[10] __mstate;
             }
 
             ___prof __prof;
@@ -1046,7 +1049,7 @@ else
 {
     static assert(false, "Unsupported platform");
 }
-
+}
 
 //
 // XOpen (XSI)
@@ -1882,6 +1885,9 @@ int sigtimedwait(in sigset_t*, siginfo_t*, in timespec*);
 int sigwaitinfo(in sigset_t*, siginfo_t*);
 */
 
+nothrow:
+@nogc:
+
 version( linux )
 {
     private enum __SIGEV_MAX_SIZE = 64;
@@ -1998,9 +2004,6 @@ else
 int pthread_kill(pthread_t, int);
 int pthread_sigmask(int, in sigset_t*, sigset_t*);
 */
-
-nothrow:
-@nogc:
 
 version( linux )
 {
